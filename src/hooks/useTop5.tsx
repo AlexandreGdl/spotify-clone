@@ -1,9 +1,10 @@
 import { AppContext } from "contexts";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { SpotifyTopTracksResponse } from "types/api";
 
 export const useTop5 = () => {
   const appManager = useContext(AppContext);
-  const [data, setData] = useState<any | null>(null);
+  const [data, setData] = useState<SpotifyTopTracksResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
 
@@ -27,5 +28,5 @@ export const useTop5 = () => {
     fetchArtist();
   }, [fetchArtist]);
 
-  return {artist: data, loading, error, refetch: fetchArtist};
+  return {data, loading, error, refetch: fetchArtist};
 }

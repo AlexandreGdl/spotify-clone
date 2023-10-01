@@ -5,9 +5,22 @@ import { observer } from "mobx-react-lite";
 import { useContext } from "react";
 
 const Profile = observer(() => {
-  useTop5();
+  const {loading, error, data} = useTop5();
+
+  if (loading) {
+    return <div>loading ...</div>
+  }
+
+  if (error || !data) {
+    return <div>Error</div>
+  }
+
   return (
-    <div>toto</div>
+    <ul>
+      {data.items.map((item) => (
+        <p>{item.name}</p>
+      ))}
+    </ul>
   )
 });
 
