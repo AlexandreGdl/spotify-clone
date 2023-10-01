@@ -1,22 +1,22 @@
+import { makeAutoObservable, observable, action } from "mobx";
 import { SpotifyApi } from "../api";
 
 export class AppManager {
-  private spotify_api: SpotifyApi;
-  user_code: string | undefined; 
+  @observable
+  spotifyApi: SpotifyApi = new SpotifyApi();
 
-  constructor(accessToken: string) {
-    this.spotify_api = new SpotifyApi(accessToken);
-    
+  constructor() {
+    makeAutoObservable(this);
     this.retrieveCode();
   }
 
-  get spotifyApi(): SpotifyApi {
-    return this.spotify_api;
-  }
-
+  @action
   private async retrieveCode(): Promise<void> {
+    console.log('hiii');
+    if (typeof this.spotifyApi.accessToken !== 'undefined') return;
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
+
     const codeVerifier = localStorage.getItem('code_verifier');
 
     const body = new URLSearchParams({
@@ -27,30 +27,25 @@ export class AppManager {
       code_verifier: codeVerifier ?? 'undefined'
     });
 
-    fetch('https://accounts.spotify.com/api/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body
-    })
-    .then(response => {
+    try {
+      const response = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body
+      });
       if (!response.ok) {
         throw new Error('HTTP status ' + response.status);
       }
-      return response.json();
-    })
-    .then(data => {
+      const data = await response.json();
       localStorage.setItem('access_token', data.access_token);
+      this.spotifyApi.updateAccessToken(data.access_token);
       console.log(data.access_token);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-
-    if (code) {
-      this.user_code = code;
-      this.spotifyApi.setUserCode(code);
+      window.history.pushState({}, '', window.location.pathname);
+    }
+    catch (e) {
+      console.error('Error:', e);
     }
   }
 }

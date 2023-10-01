@@ -1,20 +1,28 @@
 import axios, { AxiosResponse, AxiosHeaders } from "axios";
+import { observable, makeObservable, computed, action } from "mobx";
 
 export class ApiService {
-  private access_token: string;
-  private user_code: string | undefined = undefined;
+  @observable
+  private access_token: string |undefined = undefined;
 
-  constructor(accessToken: string) {
-    this.access_token = accessToken;
+  constructor() {
+    makeObservable(this)
   }
 
-  set userCode(code: string) {
-    this.user_code = code;
+  @computed
+  get accessToken(): string | undefined {
+    return this.access_token;
   }
 
+  @action
+  updateAccessToken(token: string | undefined) {
+    this.access_token = token;
+  }
+
+  @computed
   private get headers(): AxiosHeaders {
     return new AxiosHeaders({
-      'Authorization': `Bearer ${this.user_code ?? this.access_token}`
+      'Authorization': `Bearer ${this.access_token}`
     })
   }
 

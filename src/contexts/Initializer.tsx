@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { AppContext } from "./AppContext";
 import { AppManager } from "services/app";
 
@@ -8,7 +8,7 @@ type InitializerProps = {
 }
 
 export const Initializer = (props: InitializerProps) => {
-  const appManager = new AppManager(props.accessToken);
+  const [appManager] = useState(new AppManager());
 
   return (
     <AppContext.Provider value={appManager}>

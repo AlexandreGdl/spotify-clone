@@ -1,31 +1,31 @@
 import { AppContext } from "contexts";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 
 export const useTop5 = () => {
   const appManager = useContext(AppContext);
-
   const [data, setData] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
 
-  useEffect(() => {
-    const fetchArtist = async () => {
-      if (!appManager) return;
-      setLoading(true);
+  const fetchArtist = useCallback(async () => {
+  if (!appManager) return;
+    setLoading(true);
+    setError(false);
+    try {
+      const response = await appManager.spotifyApi.getTopFive();
+      setData(response);
       setError(false);
-      try {
-        const response = await appManager.spotifyApi.getTopFive();
-        setData(response);
-        setError(false);
-      } catch (e) {
-        setData(null);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
+    } catch (e) {
+      setData(null);
+      setError(true);
+    } finally {
+      setLoading(false);
     }
-    fetchArtist();
-  }, [appManager]);
+  }, [appManager])
 
-  return {artist: data, loading, error};
+  useEffect(() => {
+    fetchArtist();
+  }, [fetchArtist]);
+
+  return {artist: data, loading, error, refetch: fetchArtist};
 }

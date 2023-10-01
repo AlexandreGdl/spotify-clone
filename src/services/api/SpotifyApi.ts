@@ -3,17 +3,8 @@ import { ApiService } from "./ApiService";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 
-export class SpotifyApi {
+export class SpotifyApi extends ApiService {
   private base_url = 'https://api.spotify.com/v1/';
-  private apiService: ApiService;
-
-  constructor(accessToken: string) {
-    this.apiService = new ApiService(accessToken);
-  }
-
-  public setUserCode(code: string) {
-    this.apiService.userCode = code;
-  }
 
   async validateResponse(data: object): Promise<void> {
     const errors = await validate(data);
@@ -22,7 +13,7 @@ export class SpotifyApi {
   
   async getArtist(id: string): Promise<SpotifyArtistResponse> {
     try {
-      const response = await this.apiService.get<SpotifyArtistResponse>(`${this.base_url}artists/${id}`);
+      const response = await this.get<SpotifyArtistResponse>(`${this.base_url}artists/${id}`);
       const data = plainToInstance(SpotifyArtistResponse, response.data);
       await this.validateResponse(data);
       return data;
@@ -33,7 +24,7 @@ export class SpotifyApi {
 
   async getTopFive(): Promise<any> {
     try {
-      const response = await this.apiService.get(`${this.base_url}me/top/tracks?time_range=short_term&limit=5`);
+      const response = await this.get(`${this.base_url}me/top/tracks?time_range=short_term&limit=5`);
       return response.data;
     } catch (e) {
       throw e;

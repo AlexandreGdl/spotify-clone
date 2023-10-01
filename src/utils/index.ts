@@ -9,16 +9,24 @@ export function generateRandomString(length: number) {
 }
 
 export async function generateCodeChallenge(codeVerifier: string) {
-  function base64encode(data: any) {
-    return btoa(String.fromCharCode.apply(null, data))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
-  }
+  const codeVerifierBytes = new TextEncoder().encode(codeVerifier)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', codeVerifierBytes)
+  return base64url(new Uint8Array(hashBuffer));
+}
 
-  const encoder = new TextEncoder();
-  const data = encoder.encode(codeVerifier);
-  const digest = await window.crypto.subtle.digest('SHA-256', data);
+/**
+ * @param {number} size
+ */
+export function randomBytes(size: any) {
+  return crypto.getRandomValues(new Uint8Array(size))
+}
 
-  return base64encode(digest);
+/**
+ * @param {Uint8Array} bytes
+ */
+export function base64url(bytes: any) {
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
 }
