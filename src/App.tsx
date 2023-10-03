@@ -4,20 +4,21 @@ import 'reflect-metadata';
 import { useSpotifyCredentials } from 'hooks';
 import { Initializer } from 'contexts';
 import { MainApp } from 'features';
+import { LoadingApp } from 'components';
 
 function App() {
-  const {data, loading, error} = useSpotifyCredentials(
+  const {data, status} = useSpotifyCredentials(
     process.env.REACT_APP_SPOTIFY_CLIENT_ID ?? '',
     process.env.REACT_APP_SPOTIFY_CLIENT_SECRET ?? ''
   );
   
-  if (loading) {
+  if (status === 'loading' || status === 'idle') {
     return (
-      <p>Loading ...</p>
+      <LoadingApp/>
     )
   }
 
-  if (error || !data) {
+  if (status === 'error' || !data) {
     return  (
       <p>Error</p>
     )

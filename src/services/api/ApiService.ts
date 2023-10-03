@@ -26,9 +26,10 @@ export class ApiService {
     })
   }
 
-  async get<T>(url: string): Promise<AxiosResponse<T>> {
+  async get<T>(url: string, abortController?: AbortController): Promise<AxiosResponse<T>> {
     return axios.get<T>(url, {
       headers: this.headers,
+      signal: abortController?.signal
     });
   }
 }

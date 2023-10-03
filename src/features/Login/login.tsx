@@ -1,5 +1,12 @@
 import { useCallback } from "react"
+import styled from "styled-components";
 import { base64url, generateCodeChallenge, randomBytes } from "utils";
+
+const Container = styled('div')`
+  background-color: #121212;
+  width: 100vw;
+  height: 100vh;
+`;
 
 export const Login = () => {
   const fetchUserToken = useCallback(() => {
@@ -27,8 +34,8 @@ export const Login = () => {
   
 
   return (
-    <div>
+    <Container>
       <button onClick={fetchUserToken}>login</button>
-    </div>  
+    </Container>  
   )
 }

@@ -8,12 +8,12 @@ export const useTop5 = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
 
-  const fetchArtist = useCallback(async () => {
+  const fetchArtist = useCallback(async (abortController: AbortController) => {
   if (!appManager) return;
     setLoading(true);
     setError(false);
     try {
-      const response = await appManager.spotifyApi.getTopFive();
+      const response = await appManager.spotifyApi.getTopFive(abortController);
       setData(response);
       setError(false);
     } catch (e) {
@@ -25,7 +25,13 @@ export const useTop5 = () => {
   }, [appManager])
 
   useEffect(() => {
-    fetchArtist();
+    const abortCOntroller = new AbortController();
+
+    fetchArtist(abortCOntroller);
+
+    return () => {
+      abortCOntroller.abort();
+    }
   }, [fetchArtist]);
 
   return {data, loading, error, refetch: fetchArtist};

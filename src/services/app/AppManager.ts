@@ -1,7 +1,10 @@
 import { makeAutoObservable, observable, action } from "mobx";
 import { SpotifyApi } from "../api";
+import { SpotifyUser } from "types/api";
 
 export class AppManager {
+  @observable
+  spotifyUser: SpotifyUser | undefined = undefined;
   @observable
   spotifyApi: SpotifyApi = new SpotifyApi();
 
@@ -12,11 +15,10 @@ export class AppManager {
 
   @action
   private async retrieveCode(): Promise<void> {
-    console.log('hiii');
     if (typeof this.spotifyApi.accessToken !== 'undefined') return;
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-
+    if (!code) return;
     const codeVerifier = localStorage.getItem('code_verifier');
 
     const body = new URLSearchParams({
@@ -41,11 +43,20 @@ export class AppManager {
       const data = await response.json();
       localStorage.setItem('access_token', data.access_token);
       this.spotifyApi.updateAccessToken(data.access_token);
-      console.log(data.access_token);
       window.history.pushState({}, '', window.location.pathname);
+      // Once access token set, fetch the user
+
+      this.fetchUser();
     }
     catch (e) {
       console.error('Error:', e);
     }
+  }
+
+  @action
+  async fetchUser(abortController?: AbortController): Promise<SpotifyUser | undefined> {
+    const user = await this.spotifyApi.getUser(abortController);
+    this.spotifyUser = user;
+    return user;
   }
 }

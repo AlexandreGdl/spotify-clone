@@ -10,12 +10,13 @@ export const useArtist = (id: string) => {
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
+    const abortController = new AbortController();
     const fetchArtist = async () => {
       if (!appManager) return;
       setLoading(true);
       setError(false);
       try {
-        const response = await appManager.spotifyApi.getArtist(id);
+        const response = await appManager.spotifyApi.getArtist(id, abortController);
         setData(response);
         setError(false);
       } catch (e) {
@@ -26,6 +27,10 @@ export const useArtist = (id: string) => {
       }
     }
     fetchArtist();
+
+    return () => {
+      abortController.abort();
+    }
   }, [id, appManager]);
 
   return {artist: data, loading, error};

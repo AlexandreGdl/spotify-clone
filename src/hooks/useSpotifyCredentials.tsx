@@ -4,17 +4,19 @@ import { SpotifyCredentialsResponse } from '../types/api';
 
 export const useSpotifyCredentials = (clientId: string, clientSecret: string) => {
   const [data, setData] = useState<SpotifyCredentialsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<unknown>(null);
+  const [status, setStatus] = useState<'idle' | 'loading' |'error' | 'success'>('idle');
 
   useEffect(() => {
+    const abortController = new AbortController();
     const fetchToken = async () => {
+      setStatus('loading');
       try {
         const response = await fetch('https://accounts.spotify.com/api/token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
+          signal: abortController.signal,
           body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
         });
 
@@ -24,17 +26,21 @@ export const useSpotifyCredentials = (clientId: string, clientSecret: string) =>
 
         const jsonData = await response.json();
         setData(plainToInstance(SpotifyCredentialsResponse, jsonData));
-        setLoading(false);
+        setStatus('success');
       } catch (error) {
-        setError(error);
-        setLoading(false);
+        const signal = abortController.signal;
+        if (signal.aborted) return;
+        setStatus('error');
       }
     };
 
     fetchToken();
+    return () => {
+      abortController.abort();
+    }
   }, [clientId, clientSecret]);
 
-  return { data, loading, error };
+  return { data, status };
 };
 
 export default useSpotifyCredentials;

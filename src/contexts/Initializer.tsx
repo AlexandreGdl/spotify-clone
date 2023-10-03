@@ -7,9 +7,9 @@ type InitializerProps = {
   children: ReactNode
 }
 
-export const Initializer = (props: InitializerProps) => {
-  const [appManager] = useState(new AppManager());
+const appManager = new AppManager();
 
+export const Initializer = (props: InitializerProps) => {
   return (
     <AppContext.Provider value={appManager}>
       {props.children}

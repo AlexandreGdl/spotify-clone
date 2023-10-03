@@ -1,4 +1,4 @@
-import { SpotifyArtistResponse, SpotifyTopTracksResponse } from "types/api";
+import { SpotifyArtistResponse, SpotifyTopTracksResponse, SpotifyUser } from "types/api";
 import { ApiService } from "./ApiService";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
@@ -11,9 +11,9 @@ export class SpotifyApi extends ApiService {
     if (errors.length > 0) throw Error('Validation error on following instance : ', data);
   }
   
-  async getArtist(id: string): Promise<SpotifyArtistResponse> {
+  async getArtist(id: string, abortController: AbortController): Promise<SpotifyArtistResponse> {
     try {
-      const response = await this.get<SpotifyArtistResponse>(`${this.base_url}artists/${id}`);
+      const response = await this.get<SpotifyArtistResponse>(`${this.base_url}artists/${id}`, abortController);
       const data = plainToInstance(SpotifyArtistResponse, response.data);
       await this.validateResponse(data);
       return data;
@@ -22,10 +22,22 @@ export class SpotifyApi extends ApiService {
     }
   }
 
-  async getTopFive(): Promise<SpotifyTopTracksResponse> {
+  async getTopFive(abortController: AbortController): Promise<SpotifyTopTracksResponse> {
     try {
-      const response = await this.get<SpotifyTopTracksResponse>(`${this.base_url}me/top/tracks?time_range=short_term&limit=5`);
+      const response = await this.get<SpotifyTopTracksResponse>(`${this.base_url}me/top/tracks?time_range=short_term&limit=5`, abortController);
       const data = plainToInstance(SpotifyTopTracksResponse, response.data);
+      await this.validateResponse(data);
+      return data;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async getUser(abortController?: AbortController): Promise<SpotifyUser | undefined> {
+    if (typeof this.accessToken === 'undefined') return undefined;
+    try {
+      const response = await this.get<SpotifyUser>(`${this.base_url}me`, abortController);
+      const data = plainToInstance(SpotifyUser, response.data);
       await this.validateResponse(data);
       return data;
     } catch (e) {
