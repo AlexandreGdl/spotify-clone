@@ -1,4 +1,4 @@
-import { SideBar } from "components";
+import { LoadingApp, SideBar } from "components";
 import { Login } from "features/Login";
 import { useSpotifyUser } from "hooks";
 import { observer } from "mobx-react-lite";
@@ -8,8 +8,8 @@ const Container = styled('div')`
   display: flex;
   align-items: stretch;
   background-color: #000000;
-  width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 16px);
+  width: auto;
   padding: 8px;
 `;
 
@@ -23,11 +23,11 @@ export const MainApp = observer(() => {
   const userQuery = useSpotifyUser();
 
   if (userQuery.status === 'loading' || userQuery.status === 'idle') {
-    return <div>loading...</div>
+    return <LoadingApp />
   }
 
   if (userQuery.status === 'error' || !userQuery.data) {
-    return <Login />
+    return <Login />;
   }
 
   return (

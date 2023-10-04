@@ -1,41 +1,57 @@
-import { useCallback } from "react"
+import NeonCursor from "components/NeonCursor";
 import styled from "styled-components";
-import { base64url, generateCodeChallenge, randomBytes } from "utils";
+import { getUserAuthorization } from "utils/User";
 
 const Container = styled('div')`
-  background-color: #121212;
+  background-color: #000000;
   width: 100vw;
   height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 80px;
+  overflow: hidden;
+  cursor: none;
+`;
+const Title = styled('h1')`
+  color: #FFF;
+  font-size: 5em;
+  text-align: center;
+  text-transform: uppercase;
+  z-index: 13;
+`;
+const Button = styled('button')`
+  text-transform: uppercase;
+  box-shadow: 0 0 50px 8px ${({theme}) => theme.colors.main};
+  padding: 20px 50px;
+  background-color: transparent;
+  border-radius: 50px;
+  border: 1px solid ${({theme}) => theme.colors.main};
+  color: #FFF;
+  font-weight: 400;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.3em;
+  cursor: none;
+
+  &:hover {
+    background-color: ${({theme}) => theme.colors.main};
+    color: #000;
+    box-shadow: 0 0 50px 2px ${({theme}) => theme.colors.main};
+  }
+
+  transition: all .2s;
 `;
 
 export const Login = () => {
-  const fetchUserToken = useCallback(() => {
-    const redirectUri = 'http://localhost:3000';
-    const codeVerifier = base64url(randomBytes(96))
-    const state = base64url(randomBytes(96))
-    generateCodeChallenge(codeVerifier).then((codeChallenge: string) => {
-      const scope = 'user-read-private user-read-email user-top-read';
-      
-      localStorage.setItem('code_verifier', codeVerifier);
-
-      const args = new URLSearchParams({
-        response_type: 'code',
-        client_id: process.env.REACT_APP_SPOTIFY_CLIENT_ID ?? '',
-        scope,
-        redirect_uri: redirectUri,
-        state,
-        code_challenge_method: 'S256',
-        code_challenge: codeChallenge,
-      });
-    
-      window.location.assign('https://accounts.spotify.com/authorize?' + args);
-    })
-  }, []);
-  
-
   return (
     <Container>
-      <button onClick={fetchUserToken}>login</button>
+      <Title>Spotify-Clone</Title>
+      <Button onClick={getUserAuthorization}>Connexion</Button>
+      <NeonCursor />
     </Container>  
   )
 }
