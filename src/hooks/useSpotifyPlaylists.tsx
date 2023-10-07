@@ -1,20 +1,17 @@
 import { AppContext } from "contexts";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { SpotifyUser } from "types/api";
+import { SpotifyPlaylistsResponse } from "types/api";
 
-export const useSpotifyUser = () => {
+export const useSpotifyPLaylists = () => {
   const appManager = useContext(AppContext);
   if (!appManager) throw Error('AppManager should be initialized');
-  const [data, setData] = useState<SpotifyUser | undefined>(undefined);
+  const [data, setData] = useState<SpotifyPlaylistsResponse | undefined>(undefined);
   const [status, setStatus] = useState<'idle' | 'loading' |'error' | 'success'>('idle');
 
-  const fetchUser = useCallback(async (abortController: AbortController) => {
+  const fetchPlaylists = useCallback(async (abortController: AbortController) => {
     setStatus('loading');
     try {
-      let response: SpotifyUser | undefined = appManager.spotifyUser;
-      if (typeof appManager.spotifyUser === 'undefined') {
-        response = await appManager.fetchUser(abortController);
-      }
+      const response = await appManager.spotifyApi.getCurrentUserPlaylists(abortController);
       setData(response);
       setStatus('success')
     } catch (e) {
@@ -28,12 +25,12 @@ export const useSpotifyUser = () => {
   useEffect(() => {
     const abortCOntroller = new AbortController();
 
-    fetchUser(abortCOntroller);
+    fetchPlaylists(abortCOntroller);
 
     return () => {
       abortCOntroller.abort();
     }
-  }, [fetchUser]);
+  }, [fetchPlaylists]);
 
-  return {data, status, refetch: fetchUser};
+  return {data, status, refetch: fetchPlaylists};
 }

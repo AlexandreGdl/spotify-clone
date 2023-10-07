@@ -1,3 +1,5 @@
+export * from './withClamp';
+
 export function generateRandomString(length: number) {
   let text = '';
   let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

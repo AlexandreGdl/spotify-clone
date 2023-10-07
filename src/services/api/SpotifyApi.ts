@@ -1,4 +1,4 @@
-import { SpotifyArtistResponse, SpotifyTopTracksResponse, SpotifyUser } from "types/api";
+import { SpotifyArtistResponse, SpotifyPlaylistsResponse, SpotifyTopTracksResponse, SpotifyUser } from "types/api";
 import { ApiService } from "./ApiService";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
@@ -26,6 +26,17 @@ export class SpotifyApi extends ApiService {
     try {
       const response = await this.get<SpotifyTopTracksResponse>(`${this.base_url}me/top/tracks?time_range=short_term&limit=5`, abortController);
       const data = plainToInstance(SpotifyTopTracksResponse, response.data);
+      await this.validateResponse(data);
+      return data;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async getCurrentUserPlaylists(abortController?: AbortController): Promise<SpotifyPlaylistsResponse> {
+    try {
+      const response = await this.get<SpotifyPlaylistsResponse>(`${this.base_url}me/playlists`, abortController);
+      const data = plainToInstance(SpotifyPlaylistsResponse, response.data);
       await this.validateResponse(data);
       return data;
     } catch (e) {

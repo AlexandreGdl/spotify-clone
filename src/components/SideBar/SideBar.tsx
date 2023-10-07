@@ -26,7 +26,7 @@ const Resizer = styled('div')`
 `;
 
 export const SideBar = () => {
-  const {ref} = useHorizontalDrag('--sidebar-width');
+  const {ref} = useHorizontalDrag('--sidebar-width', 200, 500);
 
   return (
     <Container id="side-container">

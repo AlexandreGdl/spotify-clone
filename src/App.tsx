@@ -5,6 +5,7 @@ import { useSpotifyCredentials } from 'hooks';
 import { Initializer } from 'contexts';
 import { MainApp } from 'features';
 import { LoadingApp } from 'components';
+import 'react-loading-skeleton/dist/skeleton.css'
 
 function App() {
   const {data, status} = useSpotifyCredentials(

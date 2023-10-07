@@ -4,13 +4,12 @@ import styled from 'styled-components';
 import { ButtonLink } from './ButtonLink';
 
 const HeaderContainer = styled('div')`
-  width: 100%;
-  background-color: #121212;
+  background-color: ${({theme}) => theme.colors.secondary};
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 10px 0;
+  padding: 8px 12px;
 `;
 export const Header = React.memo(() => {
   return (

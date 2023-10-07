@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { withClamp } from "utils";
 
-export const useHorizontalDrag = (varName: string) => {
+export const useHorizontalDrag = (varName: string, min = 10, max = 800) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [, setWidth] = useState(331)
+  const [, setWidth] = useState(331);
 
   useEffect(() => {
     const resizer = ref.current;
@@ -11,8 +12,9 @@ export const useHorizontalDrag = (varName: string) => {
     resizer.onmousedown = () => {
       resizer.onmousemove = (e: MouseEvent) => {
         setWidth(w => {
-          document.documentElement.style.setProperty(varName, `${ w + e.movementX}px`);
-          return w + e.movementX;
+          const newWidth = withClamp(w+e.movementX, min, max);
+          document.documentElement.style.setProperty(varName, `${newWidth}px`);
+          return newWidth;
         });
         
       }
@@ -28,7 +30,7 @@ export const useHorizontalDrag = (varName: string) => {
         resizer.onmousemove = null;
       }
     }
-  }, [ref, varName]);
+  }, [ref, varName, min, max]);
 
   return {ref}
 }

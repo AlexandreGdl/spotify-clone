@@ -26,7 +26,7 @@ export async function getUserToken(): Promise<undefined | any> {
 
 
 export function getUserAuthorization() {
-  const scope = 'user-read-private user-read-email user-top-read';
+  const scope = 'user-read-private user-read-email user-top-read playlist-read-private';
   const codeVerifier = base64url(randomBytes(96))
   const state = base64url(randomBytes(96))
 
